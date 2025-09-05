@@ -1,0 +1,19 @@
+{
+  "name": "ftasks.next.api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node -e \"console.log('No tests specified')\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.9.7",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1"
+  }
+}
