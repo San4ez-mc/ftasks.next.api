@@ -1,0 +1,587 @@
+openapi: 3.0.1
+info:
+  title: FINEKO API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /auth/telegram/login:
+    post:
+      summary: Логін через Telegram
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramLoginRequest'
+      responses:
+        '200':
+          description: JWT і дані користувача
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /auth/me:
+    get:
+      summary: Профіль поточного користувача
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Об’єкт користувача
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithCompanies'
+  /auth/logout:
+    post:
+      summary: Вийти з сесії
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Без вмісту
+  /companies:
+    get:
+      summary: Список компаній користувача
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив компаній
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Company'
+    post:
+      summary: Створити компанію
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyRequest'
+      responses:
+        '201':
+          description: Нова компанія
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyWithOwner'
+  /companies/{companyId}/employees:
+    get:
+      summary: Співробітники компанії
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив співробітників
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+    post:
+      summary: Додати співробітника
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '201':
+          description: Новий співробітник
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+  /companies/{companyId}/employees/{employeeId}:
+    patch:
+      summary: Оновити співробітника
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '200':
+          description: Оновлений співробітник
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+    delete:
+      summary: Видалити співробітника
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Без вмісту
+  /companies/{companyId}/tasks:
+    get:
+      summary: Завдання компанії
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив завдань
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      summary: Створити завдання
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '201':
+          description: Нове завдання
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+  /companies/{companyId}/tasks/{taskId}:
+    patch:
+      summary: Оновити завдання
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: Оновлене завдання
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+    delete:
+      summary: Видалити завдання
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Без вмісту
+  /companies/{companyId}/results:
+    get:
+      summary: Результати компанії
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив результатів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Result'
+    post:
+      summary: Створити результат
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Result'
+      responses:
+        '201':
+          description: Новий результат
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+  /companies/{companyId}/results/{resultId}:
+    patch:
+      summary: Оновити результат
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Result'
+      responses:
+        '200':
+          description: Оновлений результат
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+    delete:
+      summary: Видалити результат
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Без вмісту
+  /companies/{companyId}/org-structure:
+    get:
+      summary: Організаційна структура
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив вузлів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrgNode'
+    post:
+      summary: Додати вузол
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgNode'
+      responses:
+        '201':
+          description: Новий вузол
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgNode'
+  /companies/{companyId}/org-structure/{nodeId}:
+    patch:
+      summary: Оновити вузол
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgNode'
+      responses:
+        '200':
+          description: Оновлений вузол
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgNode'
+    delete:
+      summary: Видалити вузол
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Без вмісту
+  /processes:
+    get:
+      summary: Перелік процесів
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив процесів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Process'
+    post:
+      summary: Створити процес
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Process'
+      responses:
+        '201':
+          description: Новий процес
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+  /processes/{processId}:
+    patch:
+      summary: Оновити процес
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Process'
+      responses:
+        '200':
+          description: Оновлений процес
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+    delete:
+      summary: Видалити процес
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Без вмісту
+  /instructions:
+    get:
+      summary: Перелік інструкцій
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив інструкцій
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instruction'
+    post:
+      summary: Створити інструкцію
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Instruction'
+      responses:
+        '201':
+          description: Нова інструкція
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instruction'
+  /instructions/{instructionId}:
+    patch:
+      summary: Оновити інструкцію
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Instruction'
+      responses:
+        '200':
+          description: Оновлена інструкція
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instruction'
+  /telegram/groups:
+    get:
+      summary: Telegram групи
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив груп
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+  /telegram/groups/link:
+    post:
+      summary: Прив'язати групу
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                linkCode:
+                  type: string
+      responses:
+        '200':
+          description: Нова група
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+  /telegram/groups/{groupId}/members:
+    get:
+      summary: Учасники групи
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Масив учасників
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupMember'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    TelegramLoginRequest:
+      type: object
+      required: [tgUserId, firstName, lastName]
+      properties:
+        tgUserId:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        photoUrl:
+          type: string
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          nullable: true
+    UserWithCompanies:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            companies:
+              type: array
+              items:
+                $ref: '#/components/schemas/Company'
+    Company:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    CreateCompanyRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+      CompanyWithOwner:
+        allOf:
+          - $ref: '#/components/schemas/Company'
+          - type: object
+            properties:
+              ownerId:
+                type: integer
+      Employee:
+        type: object
+        properties:
+          id:
+            type: string
+          userId:
+            type: string
+          role:
+            type: string
+      Task:
+        type: object
+        properties:
+          id:
+            type: string
+          title:
+            type: string
+          description:
+            type: string
+      Result:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          status:
+            type: string
+      OrgNode:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          parentId:
+            type: string
+      Process:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+      Instruction:
+        type: object
+        properties:
+          id:
+            type: string
+          title:
+            type: string
+          content:
+            type: string
+      Group:
+        type: object
+        properties:
+          id:
+            type: string
+          title:
+            type: string
+      GroupMember:
+        type: object
+        properties:
+          id:
+            type: string
+          username:
+            type: string
