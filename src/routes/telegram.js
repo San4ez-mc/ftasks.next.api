@@ -5,9 +5,22 @@ const { getPool } = require('../db');
 
 const router = express.Router();
 
-const { TELEGRAM_BOT_TOKEN, APP_URL, JWT_SECRET } = process.env;
+
+const {
+  TELEGRAM_BOT_TOKEN,
+  TELEGRAM_SECRET,
+  FRONTEND_URL,
+  JWT_SECRET,
+} = process.env;
 
 router.post('/webhook', async (req, res) => {
+  if (
+    TELEGRAM_SECRET &&
+    req.get('x-telegram-bot-api-secret-token') !== TELEGRAM_SECRET
+  ) {
+    return res.sendStatus(401);
+  }
+
   const update = req.body;
   try {
     if (!update.message) return res.sendStatus(200);
@@ -29,15 +42,15 @@ router.post('/webhook', async (req, res) => {
         userId = rows[0].id;
       }
       const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '5m' });
-      const loginUrl = `${APP_URL}/select-company?token=${token}`;
+      const loginUrl = `${FRONTEND_URL}/auth/telegram/callback?token=${token}`;
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chat.id,
-          text: 'Please click the button below to complete your login.',
+          text: 'Натисніть кнопку нижче, щоб увійти в таск трекер.',
           reply_markup: {
-            inline_keyboard: [[{ text: 'Complete Login to FINEKO', url: loginUrl }]]
+            inline_keyboard: [[{ text: 'Увійти в таск трекер', url: loginUrl }]]
           }
         })
       });
@@ -47,7 +60,7 @@ router.post('/webhook', async (req, res) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chat.id,
-          text: 'Welcome! To log in to the FINEKO app, please use the login button inside the application.'
+          text: 'Ласкаво просимо! Для входу скористайтеся кнопкою входу в застосунку.'
         })
       });
     }

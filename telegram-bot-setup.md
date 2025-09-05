@@ -10,6 +10,8 @@ This document provides a guide for setting up the Telegram bot and outlines the 
    * **Name**: This is the display name (e.g., `FINEKO Tasks`).
    * **Username**: This must be unique and end in `bot` (e.g., `FinekoTasks_Bot`).
 4. **Save the HTTP API Token**: BotFather will provide you with a token. This is your bot's secret key. Store it securely in your backend's environment variables (e.g., `TELEGRAM_BOT_TOKEN`). **Do not expose this token on the frontend.**
+5. **Generate a Secret Token**: Create a random string and keep it in your `.env` as `TELEGRAM_SECRET`. Telegram will include this value in the `X-Telegram-Bot-Api-Secret-Token` header for each webhook call.
+
 
 ## 2. Bot Backend Logic
 
@@ -19,10 +21,12 @@ Your backend server (e.g., `https://api.tasks.fineko.space/`) needs to handle in
 
 You need to tell Telegram where to send updates for your bot. This is done by making a single API call:
 
-`https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=<YOUR_BACKEND_WEBHOOK_URL>`
+`https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=<YOUR_BACKEND_WEBHOOK_URL>&secret_token=<YOUR_TELEGRAM_SECRET>`
 
 - `<YOUR_BOT_TOKEN>`: The token you got from BotFather.
 - `<YOUR_BACKEND_WEBHOOK_URL>`: A public URL on your backend that will receive POST requests from Telegram (e.g., `https://api.tasks.fineko.space/telegram/webhook`). This endpoint must be accessible without authentication so that Telegram can reach it.
+- `<YOUR_TELEGRAM_SECRET>`: The same value as `TELEGRAM_SECRET` from your environment.
+
 
 ### Handling the `/start` Command
 
@@ -64,25 +68,27 @@ When your webhook receives a message:
    * Sign the token with a secret key stored on your backend (e.g., `JWT_SECRET`).
 
 5. **Construct the Redirect URL**:
-   * Create the URL for the user to be redirected back to the frontend:
-     `https://[YOUR_APP_URL]/select-company?token=<temporary_jwt_token>`
-   * `[YOUR_APP_URL]` should be a configurable environment variable on your backend (e.g., `APP_URL`).
+
+    * Create the URL for the user to be redirected back to the frontend:
+       `https://[FRONTEND_URL]/auth/telegram/callback?token=<temporary_jwt_token>`
+    * `[FRONTEND_URL]` should be a configurable environment variable on your backend (e.g., `FRONTEND_URL`).
 
 6. **Send a Reply Message**:
    * Use the Telegram Bot API's `sendMessage` method to send a message back to the user.
-   * This message should contain an **inline keyboard** with a "Login" button that points to the redirect URL you just constructed.
+   * This message should contain an **inline keyboard** with a "Log in to task tracker" button that points to the redirect URL you just constructed.
+
 
    **Example `sendMessage` request body:**
    ```json
    {
      "chat_id": 123456789,
-     "text": "Please click the button below to complete your login.",
+    "text": "Please click the button below to log in to the task tracker.",
      "reply_markup": {
        "inline_keyboard": [
          [
            {
-             "text": "Complete Login to FINEKO",
-             "url": "https://[YOUR_APP_URL]/select-company?token=..."
+             "text": "Log in to task tracker",
+             "url": "https://[FRONTEND_URL]/auth/telegram/callback?token=..."
            }
          ]
        ]
