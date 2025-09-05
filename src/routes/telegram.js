@@ -43,26 +43,44 @@ router.post('/webhook', async (req, res) => {
       }
       const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '5m' });
       const loginUrl = `${FRONTEND_URL}/auth/telegram/callback?token=${token}`;
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chat.id,
-          text: 'Натисніть кнопку нижче, щоб увійти в таск трекер.',
-          reply_markup: {
-            inline_keyboard: [[{ text: 'Увійти в таск трекер', url: loginUrl }]]
-          }
-        })
-      });
+      const loginResponse = await fetch(
+        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chat.id,
+            text: 'Натисніть кнопку нижче, щоб увійти в таск трекер.',
+            reply_markup: {
+              inline_keyboard: [[{ text: 'Увійти в таск трекер', url: loginUrl }]]
+            }
+          })
+        }
+      );
+      const loginResponseText = await loginResponse.text();
+      console.log(
+        'Telegram login message response:',
+        loginResponse.status,
+        loginResponseText
+      );
     } else {
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chat.id,
-          text: 'Ласкаво просимо! Для входу скористайтеся кнопкою входу в застосунку.'
-        })
-      });
+      const defaultResponse = await fetch(
+        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chat.id,
+            text: 'Ласкаво просимо! Для входу скористайтеся кнопкою входу в застосунку.'
+          })
+        }
+      );
+      const defaultResponseText = await defaultResponse.text();
+      console.log(
+        'Telegram default message response:',
+        defaultResponse.status,
+        defaultResponseText
+      );
     }
   } catch (err) {
     console.error('Telegram webhook error', err);
