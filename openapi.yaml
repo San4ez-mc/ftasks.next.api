@@ -16,11 +16,69 @@ paths:
               $ref: '#/components/schemas/TelegramLoginRequest'
       responses:
         '200':
-          description: JWT і дані користувача
+          description: Тимчасовий JWT токен
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                $ref: '#/components/schemas/TempTokenResponse'
+  /auth/telegram/companies:
+    get:
+      summary: Компанії користувача для вибору
+      security:
+        - tempAuth: []
+      responses:
+        '200':
+          description: Масив компаній
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Company'
+        '401':
+          description: Недійсний або протермінований токен
+  /auth/telegram/select-company:
+    post:
+      summary: Обрати компанію і отримати постійний токен
+      security:
+        - tempAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectCompanyRequest'
+      responses:
+        '200':
+          description: Постійний токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Недійсний тимчасовий токен
+        '403':
+          description: Користувач не є членом компанії
+  /auth/telegram/create-company-and-login:
+    post:
+      summary: Створити компанію та увійти
+      security:
+        - tempAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyAndLoginRequest'
+      responses:
+        '200':
+          description: Постійний токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Недійсний тимчасовий токен
   /auth/me:
     get:
       summary: Профіль поточного користувача
@@ -456,28 +514,47 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    tempAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     TelegramLoginRequest:
       type: object
-      required: [tgUserId, firstName, lastName]
+      required: [id, first_name, last_name]
       properties:
-        tgUserId:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
           type: string
         username:
           type: string
-        firstName:
+        language_code:
           type: string
-        lastName:
+    TempTokenResponse:
+      type: object
+      properties:
+        tempToken:
           type: string
-        photoUrl:
-          type: string
-    LoginResponse:
+    TokenResponse:
       type: object
       properties:
         token:
           type: string
-        user:
-          $ref: '#/components/schemas/User'
+    SelectCompanyRequest:
+      type: object
+      required: [companyId]
+      properties:
+        companyId:
+          type: string
+    CreateCompanyAndLoginRequest:
+      type: object
+      required: [companyName]
+      properties:
+        companyName:
+          type: string
     User:
       type: object
       properties:
