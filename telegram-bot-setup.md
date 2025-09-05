@@ -22,7 +22,7 @@ You need to tell Telegram where to send updates for your bot. This is done by ma
 `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=<YOUR_BACKEND_WEBHOOK_URL>`
 
 - `<YOUR_BOT_TOKEN>`: The token you got from BotFather.
-- `<YOUR_BACKEND_WEBHOOK_URL>`: A public URL on your backend that will receive POST requests from Telegram (e.g., `https://api.tasks.fineko.space/telegram/webhook`).
+- `<YOUR_BACKEND_WEBHOOK_URL>`: A public URL on your backend that will receive POST requests from Telegram (e.g., `https://api.tasks.fineko.space/telegram/webhook`). This endpoint must be accessible without authentication so that Telegram can reach it.
 
 ### Handling the `/start` Command
 

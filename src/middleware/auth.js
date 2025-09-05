@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
 
 function auth(req, res, next) {
+  // Allow Telegram webhook requests without any Authorization header
+  if (req.originalUrl === '/telegram/webhook') return next();
+
   const header = req.headers['authorization'];
   if (!header) return res.status(401).json({ message: 'Missing Authorization header' });
 
