@@ -5,6 +5,7 @@ const { getPool } = require('../db');
 
 const router = express.Router();
 
+
 const {
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_SECRET,
@@ -19,6 +20,7 @@ router.post('/webhook', async (req, res) => {
   ) {
     return res.sendStatus(401);
   }
+
   const update = req.body;
   try {
     if (!update.message) return res.sendStatus(200);
